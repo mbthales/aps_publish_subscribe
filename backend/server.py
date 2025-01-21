@@ -53,7 +53,7 @@ class Pacient:
                 for type, strategy in self._strategies.items():
                     data = strategy.simulate(self._multiply_test)
                     doctor.update(type, self._name, data)
-            time.sleep(2)
+            time.sleep(5)
 
 class Doctor(Observer):
     def __init__(self, socket):

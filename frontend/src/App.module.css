@@ -1,0 +1,30 @@
+.alert_container h1 {
+    color: white;
+    font-weight: bold;
+}
+
+.alert_container h2 {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    color: yellow;
+    font-weight: bold;
+}
+
+
+.alert_container h3 {
+    color: white;
+    font-weight: bold;
+}
+
+.alert_container p {
+    font-size: 16px;
+    color: white;
+}
+
+.alert_main_info {
+    margin-bottom: 16px;
+}
+
+.alert_main_info p {
+    font-size: 18px;
+}
