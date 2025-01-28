@@ -6,27 +6,29 @@ import Modal from './components/Modal'
 
 const App = () => {
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [criticalPatient, setCriticalPatient] = useState<string | null>(null);
 
   const handleSideBarVisibility = () => {
     setIsSideBarOpen((prevState) => !prevState);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const handleCriticalModal = (patient: string) => {
+    setCriticalPatient(patient);
+    setIsModalOpen(true);
+  }
 
   return (
     <>
       <Navbar handleSideBarVisibility={handleSideBarVisibility}  />
-      <Home sideBarVisibility={isSideBarOpen} />
+      <Home sideBarVisibility={isSideBarOpen} handleCriticalModal={handleCriticalModal} />
       
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className={styles.alert_container}>
           <h1>Alerta de Saúde!</h1>
           <h2>SUSPEITA DE ARRITMIA CARDÍACA</h2>
           <div className={styles.alert_main_info}>
-            <p><strong>Paciente:</strong> Thales da Silva</p>
+            <p><strong>Paciente:</strong> {criticalPatient}</p>
             <p><strong>Ala:</strong> 306  <strong>Leito:</strong> 16</p>
           </div>
 

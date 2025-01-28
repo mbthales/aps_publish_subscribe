@@ -35,6 +35,7 @@
 
         socket.on('oxygen', function(data) {
             if (pacient.value === data.pacient) {
+                console.log(data);
                 document.getElementById('oxygen').innerText = data.data;
             }
         });

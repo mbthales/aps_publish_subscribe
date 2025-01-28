@@ -1,4 +1,4 @@
-import styles from "./navbar.module.css"
+import styles from "./Navbar.module.css"
 import Logo from "../../assets/imgs/logo.png"
 import { FaPerson } from "react-icons/fa6";
 

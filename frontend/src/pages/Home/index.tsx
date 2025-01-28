@@ -1,46 +1,59 @@
 import { useEffect, useState } from "react";
 import Dashboard from "../../components/Dashboard";
 import Sidebar from "../../components/Sidebar";
-import styles from "./home.module.css";
+import styles from "./Home.module.css";
 import { io } from "socket.io-client";
 
 interface HomeProps {
   sideBarVisibility: boolean;
+  handleCriticalModal: (patient: string) => void;
 }
 
 export interface HeartRate {
-  pacient: string; // Paciente
+  patient: string; // patiente
   data: number; // Dados, como a taxa de batimento cardíaco ou outros valores
 }
 
-const Home = ({ sideBarVisibility }: HomeProps) => {
+const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
   const [heartRateData, setHeartRateData] = useState<HeartRate[]>([]);
   const [oxygenLevel, setOxygenLevel] = useState<{ [key: string]: number }>({});
   const [bloodPressure, setBloodPressure] = useState<{ [key: string]: string }>({});
-  const [selectedPatient, setSelectedPatient] = useState<string>("");
+  const [selectedPatient, setSelectedPatient] = useState<string>("joao");
 
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
     socket.on("heartbeat", (data) => {
+      if(data.priority === 'high'){
+        handleCriticalModal(data.patient);
+      }
+
       setHeartRateData((prevData) => {
-        const newData = [...prevData, { pacient: data.pacient, data: data.data }];
+        const newData = [...prevData, { patient: data.patient, data: data.data }];
         if (newData.length > 10) newData.shift();
         return newData;
       });
     });
 
     socket.on("oxygen", (data) => {
+      if(data.priority === 'high'){
+        handleCriticalModal(data.patient);
+      }
+
       setOxygenLevel((prevState) => ({
         ...prevState,
-        [data.pacient]: data.data, // Ajuste no campo 'pacient'
+        [data.patient]: data.data, // Ajuste no campo 'patient'
       }));
     });
 
     socket.on("pressure", (data) => {
+      if(data.priority === 'high'){
+        handleCriticalModal(data.patient);
+      }
+
       setBloodPressure((prevState) => ({
         ...prevState,
-        [data.pacient]: data.data, // Ajuste no campo 'pacient'
+        [data.patient]: data.data, // Ajuste no campo 'patient'
       }));
     });
 
@@ -48,14 +61,14 @@ const Home = ({ sideBarVisibility }: HomeProps) => {
       socket.disconnect();
     };
   }, []);
-
+    
   const handlePatientSelect = (name: string) => {
     setSelectedPatient(name);
   };
 
-  // Filtragem dos dados baseados no paciente selecionado
+  // Filtragem dos dados baseados no patiente selecionado
   const filteredHeartRateData = heartRateData.filter(
-    (data) => data.pacient === selectedPatient
+    (data) => data.patient === selectedPatient
   );
   const filteredOxygenLevel = selectedPatient
     ? oxygenLevel[selectedPatient]
@@ -67,7 +80,7 @@ const Home = ({ sideBarVisibility }: HomeProps) => {
   return (
     <div className={styles.home_container}>
       {sideBarVisibility && (
-        <div className={styles.pacientes_container}>
+        <div className={styles.patientes_container}>
           <Sidebar
             onSelectPatient={handlePatientSelect}
             selectedPatient={selectedPatient}
