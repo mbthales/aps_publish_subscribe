@@ -11,7 +11,7 @@ O sistema utiliza `Flask` no backend para simular dados de pacientes e `React` n
 
 ## Como Executar o Projeto
 ### Pré-requisitos
-- **Python 3.8+**: Para executar o backend.
+- **Python 3.10+**: Para executar o backend.
 - **Node.js 16+**: Para executar o frontend.
 - **Git**: Para clonar o repositório.
 
