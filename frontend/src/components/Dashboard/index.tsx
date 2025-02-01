@@ -28,10 +28,7 @@ const Dashboard = ({
 
   }, [heartRateData])
 
-  console.log(heartRateData,
-    oxygenLevel,
-    bloodPressure,
-    selectedPatient)
+  console.log(heartRateData, oxygenLevel, bloodPressure, selectedPatient);
 
   const data = {
     labels: heartRateData.map((_, index) => `T${index + 1}`),
@@ -115,8 +112,8 @@ const Dashboard = ({
 
           <div className={styles.notas_container}>
             <p><strong>Data de Nascimento:</strong> 15/03/1985</p>
-            <p><strong>Idade:</strong> 40 anos</p>
-            <p><strong>Sexo:</strong> Masculino</p>
+            <p><strong>Idade:</strong> 28 anos</p>
+            <p><strong>Sexo:</strong> Neutro</p>
             <p><strong>Suspeita:</strong> Dengue</p>
             <p><strong>Data da Internação:</strong> 01/01/2025</p>
           </div>

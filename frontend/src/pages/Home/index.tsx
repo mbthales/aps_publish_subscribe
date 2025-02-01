@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 
 interface HomeProps {
   sideBarVisibility: boolean;
-  handleCriticalModal: (patient: string) => void;
+  handleCriticalModal: (patient: string, heartRate?: number, oxygenLevel?: number, bloodPressure?: string) => void;
 }
 
 export interface HeartRate {
@@ -22,45 +22,45 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
 
   useEffect(() => {
     const socket = io("http://localhost:5000");
-
+  
     socket.on("heartbeat", (data) => {
-      if (data.priority === 'high') {
-        handleCriticalModal(data.patient);
+      if (data.priority === "high") {
+        handleCriticalModal(data.patient, data.data, oxygenLevel[data.patient], bloodPressure[data.patient]);
       }
-
+  
       setHeartRateData((prevData) => {
         const newData = [...prevData, { patient: data.patient, data: data.data }];
         if (newData.length > 10) newData.shift();
         return newData;
       });
     });
-
+  
     socket.on("oxygen", (data) => {
-      if (data.priority === 'high') {
-        handleCriticalModal(data.patient);
+      if (data.priority === "high") {
+        handleCriticalModal(data.patient, heartRateData.find((hr) => hr.patient === data.patient)?.data, data.data, bloodPressure[data.patient]);
       }
-
+  
       setOxygenLevel((prevState) => ({
         ...prevState,
-        [data.patient]: data.data, // Ajuste no campo 'patient'
+        [data.patient]: data.data,
       }));
     });
-
+  
     socket.on("pressure", (data) => {
-      if (data.priority === 'high') {
-        handleCriticalModal(data.patient);
+      if (data.priority === "high") {
+        handleCriticalModal(data.patient, heartRateData.find((hr) => hr.patient === data.patient)?.data, oxygenLevel[data.patient], data.data);
       }
-
+  
       setBloodPressure((prevState) => ({
         ...prevState,
-        [data.patient]: data.data, // Ajuste no campo 'patient'
+        [data.patient]: data.data,
       }));
     });
-
+  
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, []); 
 
   const handlePatientSelect = (name: string) => {
     setSelectedPatient(name);

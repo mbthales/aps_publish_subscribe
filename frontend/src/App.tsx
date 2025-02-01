@@ -7,16 +7,23 @@ import Modal from './components/Modal'
 const App = () => {
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [criticalPatient, setCriticalPatient] = useState<string | null>(null);
+  const [criticalPatientData, setCriticalPatientData] = useState<{
+    patient: string;
+    heartRate?: number;
+    oxygenLevel?: number;
+    bloodPressure?: string;
+  } | null>(null);
+  
 
   const handleSideBarVisibility = () => {
     setIsSideBarOpen((prevState) => !prevState);
   };
 
-  const handleCriticalModal = (patient: string) => {
-    setCriticalPatient(patient);
+  const handleCriticalModal = (patient: string, heartRate?: number, oxygenLevel?: number, bloodPressure?: string) => {
+    setCriticalPatientData({ patient, heartRate, oxygenLevel, bloodPressure });
     setIsModalOpen(true);
-  }
+  };
+  
 
   return (
     <>
@@ -28,15 +35,15 @@ const App = () => {
           <h1>Alerta de Saúde!</h1>
           <h2>SUSPEITA DE ARRITMIA CARDÍACA</h2>
           <div className={styles.alert_main_info}>
-            <p><strong>Paciente:</strong> {criticalPatient}</p>
+            <p><strong>Paciente:</strong> {criticalPatientData?.patient}</p>
             <p><strong>Ala:</strong> 306  <strong>Leito:</strong> 16</p>
           </div>
 
           <div>
             <h3>Quadro geral</h3>
-            <p><strong>Batimentos Cardíacos</strong> 140bpm</p>
-            <p><strong>Pressão Arterial</strong> 120/80 mmHg</p>
-            <p><strong>Oxigenação</strong> 97.5%</p>
+            <p><strong>Batimentos Cardíacos</strong> {criticalPatientData?.heartRate ?? 'N/A'} bpm</p>
+            <p><strong>Pressão Arterial</strong> {criticalPatientData?.bloodPressure ?? 'N/A'}</p>
+            <p><strong>Oxigenação</strong> {criticalPatientData?.oxygenLevel ? `${criticalPatientData.oxygenLevel}%` : 'N/A'}</p>
           </div>
         </div>
       </Modal>
