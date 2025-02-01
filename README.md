@@ -50,7 +50,7 @@ cd aps_publish_subscribe
     ```bash
      npm run dev
     ```
-  - O Frontend estará rodando em `http://localhost:3000`.
+  - O frontend estará rodando em `http://localhost:3000`.
 
 4. **Acesse o Sistema**:
   - Abra o navegador e acesse `http://localhost:3000`.
