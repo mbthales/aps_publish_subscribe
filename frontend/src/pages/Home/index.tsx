@@ -10,7 +10,7 @@ interface HomeProps {
 }
 
 export interface HeartRate {
-  patient: string; // patiente
+  patient: string; // paciente
   data: number; // Dados, como a taxa de batimento cardíaco ou outros valores
 }
 
@@ -24,7 +24,7 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
     const socket = io("http://localhost:5000");
 
     socket.on("heartbeat", (data) => {
-      if(data.priority === 'high'){
+      if (data.priority === 'high') {
         handleCriticalModal(data.patient);
       }
 
@@ -36,7 +36,7 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
     });
 
     socket.on("oxygen", (data) => {
-      if(data.priority === 'high'){
+      if (data.priority === 'high') {
         handleCriticalModal(data.patient);
       }
 
@@ -47,7 +47,7 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
     });
 
     socket.on("pressure", (data) => {
-      if(data.priority === 'high'){
+      if (data.priority === 'high') {
         handleCriticalModal(data.patient);
       }
 
@@ -61,12 +61,12 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
       socket.disconnect();
     };
   }, []);
-    
+
   const handlePatientSelect = (name: string) => {
     setSelectedPatient(name);
   };
 
-  // Filtragem dos dados baseados no patiente selecionado
+  // Filtragem dos dados baseados no paciente selecionado
   const filteredHeartRateData = heartRateData.filter(
     (data) => data.patient === selectedPatient
   );

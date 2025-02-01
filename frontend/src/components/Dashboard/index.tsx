@@ -92,14 +92,14 @@ const Dashboard = ({
         </div>
 
         <div className={styles.card_notas}>
-            <h2>Notas do paciente</h2>
-            <h3>Máx 5.</h3>
+          <h2>Notas do paciente</h2>
+          <h3>Máx 5.</h3>
 
-            <div className={styles.notas_container}>
-                <p>Apresentou comportamentos agressivos</p>
-                <p>Tomou 30gm de dopanina barata</p>
-                <p>Precisa de atenção periodica</p>
-            </div>
+          <div className={styles.notas_container}>
+            <p>Apresentou comportamentos agressivos</p>
+            <p>Tomou 30mg de dopanina barata</p>
+            <p>Precisa de atenção periodica</p>
+          </div>
 
         </div>
 
@@ -110,19 +110,19 @@ const Dashboard = ({
         </div>
 
         <div className={styles.card_notas2}>
-            <h2>Ficha do Paciente</h2>
-            <h3>{selectedPatient}</h3>
+          <h2>Ficha do Paciente</h2>
+          <h3>{selectedPatient}</h3>
 
-            <div className={styles.notas_container}>
+          <div className={styles.notas_container}>
             <p><strong>Data de Nascimento:</strong> 15/03/1985</p>
             <p><strong>Idade:</strong> 40 anos</p>
             <p><strong>Sexo:</strong> Masculino</p>
             <p><strong>Suspeita:</strong> Dengue</p>
             <p><strong>Data da Internação:</strong> 01/01/2025</p>
-            </div>
+          </div>
 
         </div>
-        
+
       </div>
     </div>
   );
