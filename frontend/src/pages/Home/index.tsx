@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 
 interface HomeProps {
   sideBarVisibility: boolean;
-  handleCriticalModal: (patient: string, heartRate?: number, oxygenLevel?: number, bloodPressure?: string) => void;
+  handleCriticalModal: (patient: string, heartRate?: number, oxygenLevel?: number, bloodPressure?: string, type?: string) => void;
 }
 
 export interface HeartRate {
@@ -25,7 +25,7 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
   
     socket.on("heartbeat", (data) => {
       if (data.priority === "high") {
-        handleCriticalModal(data.patient, data.data, oxygenLevel[data.patient], bloodPressure[data.patient]);
+        handleCriticalModal(data.patient, data.data, oxygenLevel[data.patient], bloodPressure[data.patient], "heartbeat");
       }
   
       setHeartRateData((prevData) => {
@@ -37,7 +37,7 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
   
     socket.on("oxygen", (data) => {
       if (data.priority === "high") {
-        handleCriticalModal(data.patient, heartRateData.find((hr) => hr.patient === data.patient)?.data, data.data, bloodPressure[data.patient]);
+        handleCriticalModal(data.patient, heartRateData.find((hr) => hr.patient === data.patient)?.data, data.data, bloodPressure[data.patient], "oxygen");
       }
   
       setOxygenLevel((prevState) => ({
@@ -48,7 +48,7 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
   
     socket.on("pressure", (data) => {
       if (data.priority === "high") {
-        handleCriticalModal(data.patient, heartRateData.find((hr) => hr.patient === data.patient)?.data, oxygenLevel[data.patient], data.data);
+        handleCriticalModal(data.patient, heartRateData.find((hr) => hr.patient === data.patient)?.data, oxygenLevel[data.patient], data.data, "pressure");	  
       }
   
       setBloodPressure((prevState) => ({

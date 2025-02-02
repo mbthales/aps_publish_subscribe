@@ -33,15 +33,15 @@ class ChainOfResponsibilityHandler(ABC):
 
 class HeartbeatSimulation(SimulationStrategy):
     def simulate(self):
-        return int(np.random.normal(80, 20))
+        return int(np.random.normal(80, 15))
 
 class OxygenSimulation(SimulationStrategy):
     def simulate(self):
-        return int(np.random.normal(96, 2))
+        return int(np.random.normal(96, 4))
 
 class PressureSimulation(SimulationStrategy):
     def simulate(self):
-        return int(np.random.normal(120, 4))
+        return int(np.random.normal(120, 6))
 
 class HighPriority(ChainOfResponsibilityHandler):
     def handle_request(self, doctor, patient, data, type):
@@ -100,7 +100,7 @@ class Patient:
                     data = strategy.simulate()
                     chain.handle_request(doctor, self._name, data, type)
                     
-            time.sleep(20)
+            time.sleep(10)
 
 class Doctor(Observer):
     def __init__(self, socket):
@@ -113,14 +113,20 @@ class Doctor(Observer):
 def handle_connect():
     patient = Patient("joao")
     patient2 = Patient("maria")
+    patient3 = Patient("roberto")
+    patient4 = Patient("giovana")
 
     doctor = Doctor(socketio)
 
     patient.add_doctor(doctor)
     patient2.add_doctor(doctor)
+    patient3.add_doctor(doctor)
+    patient4.add_doctor(doctor)
 
     threading.Thread(target=patient.notify_doctors, daemon=True).start()
     threading.Thread(target=patient2.notify_doctors, daemon=True).start()
+    threading.Thread(target=patient3.notify_doctors, daemon=True).start()
+    threading.Thread(target=patient4.notify_doctors, daemon=True).start()
 
 if __name__ == '__main__':
     socketio.run(app)

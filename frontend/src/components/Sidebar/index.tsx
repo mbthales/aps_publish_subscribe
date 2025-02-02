@@ -22,6 +22,12 @@ const Sidebar = ({ onSelectPatient, selectedPatient }: SidebarProps) => {
         <li>
           <button onClick={() => onSelectPatient("maria")}><FaHeartPulse /> Maria {selectedPatient === "maria" ? <FaCircleDot /> : <FaCircle />}</button>
         </li>
+        <li>
+          <button onClick={() => onSelectPatient("roberto")}><FaHeartPulse /> Roberto {selectedPatient === "roberto" ? <FaCircleDot /> : <FaCircle />}</button>
+        </li>
+        <li>
+          <button onClick={() => onSelectPatient("giovana")}><FaHeartPulse /> Giovana {selectedPatient === "giovana" ? <FaCircleDot /> : <FaCircle />}</button>
+        </li>
       </ul>
     </div>
   )

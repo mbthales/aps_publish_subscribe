@@ -12,18 +12,17 @@ const App = () => {
     heartRate?: number;
     oxygenLevel?: number;
     bloodPressure?: string;
+    type?: string;
   } | null>(null);
-  
 
   const handleSideBarVisibility = () => {
     setIsSideBarOpen((prevState) => !prevState);
   };
 
-  const handleCriticalModal = (patient: string, heartRate?: number, oxygenLevel?: number, bloodPressure?: string) => {
-    setCriticalPatientData({ patient, heartRate, oxygenLevel, bloodPressure });
+  const handleCriticalModal = (patient: string, heartRate?: number, oxygenLevel?: number, bloodPressure?: string, type?: string) => {
+    setCriticalPatientData({ patient, heartRate, oxygenLevel, bloodPressure, type });
     setIsModalOpen(true);
   };
-  
 
   return (
     <>
@@ -33,7 +32,9 @@ const App = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className={styles.alert_container}>
           <h1>Alerta de Saúde!</h1>
-          <h2>SUSPEITA DE ARRITMIA CARDÍACA</h2>
+          {criticalPatientData?.type === 'heartbeat' && <h2>TAQUICARDIA DETECTADA</h2>}
+          {criticalPatientData?.type === 'oxygen' && <h2>BAIXA OXIGENAÇÃO</h2>}
+          {criticalPatientData?.type === 'pressure' && <h2>PRESSÃO ARTERIAL ELEVADA</h2>}
           <div className={styles.alert_main_info}>
             <p><strong>Paciente:</strong> {criticalPatientData?.patient}</p>
             <p><strong>Ala:</strong> 306  <strong>Leito:</strong> 16</p>
