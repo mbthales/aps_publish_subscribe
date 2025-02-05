@@ -44,11 +44,11 @@ class PressureSimulation(SimulationStrategy):
         return int(np.random.normal(120, 6))
 
 class HighPriority(ChainOfResponsibilityHandler):
-    def handle_request(self, doctor, patient, data, type):
+    def handle_request(self, data, type):
         if self.can_handle_request(type, data):
-            doctor.update(type, patient, data, 'high')
+            return "high"
         elif self._successor:
-            return self._successor.handle_request(doctor, patient, data, type)
+            return self._successor.handle_request(data, type)
 
     def can_handle_request(self, type, data):
         if type == 'heartbeat' and data > 100:
@@ -60,11 +60,11 @@ class HighPriority(ChainOfResponsibilityHandler):
         return False
 
 class LowPriority(ChainOfResponsibilityHandler):
-    def handle_request(self, doctor, patient, data, type):
+    def handle_request(self, data, type):
         if self.can_handle_request(type, data):
-            doctor.update(type, patient, data, 'low')
+            return "low"
         elif self._successor:
-            return self._successor.handle_request(doctor, patient, data, type)
+            return self._successor.handle_request(data, type)
 
     def can_handle_request(self, type, data):
         if type == 'heartbeat' and data < 100:
@@ -79,11 +79,10 @@ class Patient:
     def __init__(self, name):
         self._name = name
         self._doctors = []
-        self._strategies = {
-            'heartbeat': HeartbeatSimulation(),
-            'oxygen': OxygenSimulation(),
-            'pressure': PressureSimulation()
-        }
+        self._strategies = {}
+
+    def set_strategy(self, type, strategy):
+        self._strategies[type] = strategy
 
     def add_doctor(self, doctor):
         self._doctors.append(doctor)
@@ -98,9 +97,10 @@ class Patient:
             for doctor in self._doctors:
                 for type, strategy in self._strategies.items():
                     data = strategy.simulate()
-                    chain.handle_request(doctor, self._name, data, type)
+                    priority = chain.handle_request(data, type)
+                    doctor.update(type, self._name, data, priority)
                     
-            time.sleep(10)
+            time.sleep(2)
 
 class Doctor(Observer):
     def __init__(self, socket):
@@ -111,22 +111,28 @@ class Doctor(Observer):
 
 @socketio.on('connect')
 def handle_connect():
-    patient = Patient("joao")
-    patient2 = Patient("maria")
-    patient3 = Patient("roberto")
-    patient4 = Patient("giovana")
-
     doctor = Doctor(socketio)
+    patient_names = ["joao", "maria", "roberto", "giovana"]
 
-    patient.add_doctor(doctor)
-    patient2.add_doctor(doctor)
-    patient3.add_doctor(doctor)
-    patient4.add_doctor(doctor)
+    default_strategies = {
+        'heartbeat': HeartbeatSimulation(),
+        'oxygen': OxygenSimulation(),
+        'pressure': PressureSimulation()
+    }
+    
+    patients = []
 
-    threading.Thread(target=patient.notify_doctors, daemon=True).start()
-    threading.Thread(target=patient2.notify_doctors, daemon=True).start()
-    threading.Thread(target=patient3.notify_doctors, daemon=True).start()
-    threading.Thread(target=patient4.notify_doctors, daemon=True).start()
+    for name in patient_names:
+        patient = Patient(name)
+        
+        for sensor_type, strategy in default_strategies.items():
+            patient.set_strategy(sensor_type, strategy)
+
+        patient.add_doctor(doctor)
+        patients.append(patient)
+
+    for patient in patients:
+        threading.Thread(target=patient.notify_doctors, daemon=True).start()
 
 if __name__ == '__main__':
     socketio.run(app)
