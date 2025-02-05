@@ -21,7 +21,7 @@ const Home = ({ sideBarVisibility, handleCriticalModal }: HomeProps) => {
   const [selectedPatient, setSelectedPatient] = useState<string>("joao");
 
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    const socket = io("ws://localhost:5000");
   
     socket.on("heartbeat", (data) => {
       if (data.priority === "high") {

@@ -1,10 +1,9 @@
-import random
 import time
 import threading
 from flask import Flask
+import numpy as np
 from flask_socketio import SocketIO
 from abc import ABC, abstractmethod
-import numpy as np
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -13,12 +12,6 @@ class Observer(ABC):
     @abstractmethod
     def update(self, type, patient, data, priority):
         pass
-
-class SimulationStrategy(ABC):
-    @abstractmethod
-    def simulate(self):
-        pass
-
 class ChainOfResponsibilityHandler(ABC):
     def __init__(self, successor=None):
         self._successor = successor
@@ -31,17 +24,29 @@ class ChainOfResponsibilityHandler(ABC):
     def can_handle_request(self, type, data):
         raise NotImplementedError("You should implement this method")
 
+class SimulationStrategy(ABC):
+    @abstractmethod
+    def simulate(self):
+        pass
+
+class ContextStrategy:
+    def __init__(self, strategy: SimulationStrategy):
+        self._strategy = strategy
+
+    def run_simulation(self):
+        return self._strategy.simulate()  
+    
 class HeartbeatSimulation(SimulationStrategy):
     def simulate(self):
-        return int(np.random.normal(80, 15))
+        return int(np.random.normal(80, 10))
 
 class OxygenSimulation(SimulationStrategy):
     def simulate(self):
-        return int(np.random.normal(96, 4))
+        return int(np.random.normal(96, 2))
 
 class PressureSimulation(SimulationStrategy):
     def simulate(self):
-        return int(np.random.normal(120, 6))
+        return int(np.random.normal(120, 4))
 
 class HighPriority(ChainOfResponsibilityHandler):
     def handle_request(self, data, type):
@@ -67,11 +72,11 @@ class LowPriority(ChainOfResponsibilityHandler):
             return self._successor.handle_request(data, type)
 
     def can_handle_request(self, type, data):
-        if type == 'heartbeat' and data < 100:
+        if type == 'heartbeat' and data <= 100:
             return True
-        elif type == 'oxygen' and data > 92:
+        elif type == 'oxygen' and data >= 92:
             return True
-        elif type == 'pressure' and data < 130:
+        elif type == 'pressure' and data <= 130:
             return True
         return False
 
@@ -79,24 +84,33 @@ class Patient:
     def __init__(self, name):
         self._name = name
         self._doctors = []
-        self._strategies = {}
+        self._sensors = {}
 
-    def set_strategy(self, type, strategy):
-        self._strategies[type] = strategy
+    def add_sensor(self, type, sensor):
+        if type not in self._sensors:
+            self._sensors[type] = ContextStrategy(sensor)
+        else:
+            raise ValueError("Sensor already added")
 
     def add_doctor(self, doctor):
-        self._doctors.append(doctor)
+        if doctor not in self._doctors:
+            self._doctors.append(doctor)
+        else:
+            raise ValueError("Doctor already added")
 
     def remove_doctor(self, doctor):
-        self._doctors.remove(doctor)
+        if doctor in self._doctors:
+            self._doctors.remove(doctor)
+        else:
+            raise ValueError("Doctor not found")
 
     def notify_doctors(self):
         chain = HighPriority(LowPriority())
 
         while True:
             for doctor in self._doctors:
-                for type, strategy in self._strategies.items():
-                    data = strategy.simulate()
+                for type, sensor in self._sensors.items():
+                    data = sensor.run_simulation()
                     priority = chain.handle_request(data, type)
                     doctor.update(type, self._name, data, priority)
                     
@@ -106,7 +120,7 @@ class Doctor(Observer):
     def __init__(self, socket):
         self.socket = socket
 
-    def update(self, type, patient, data, priority):
+    def update(self, type, patient, data, priority): 
         self.socket.emit(type, {'patient': patient, 'data': data, 'priority': priority})
 
 @socketio.on('connect')
@@ -114,7 +128,7 @@ def handle_connect():
     doctor = Doctor(socketio)
     patient_names = ["joao", "maria", "roberto", "giovana"]
 
-    default_strategies = {
+    default_sensors = {
         'heartbeat': HeartbeatSimulation(),
         'oxygen': OxygenSimulation(),
         'pressure': PressureSimulation()
@@ -125,8 +139,8 @@ def handle_connect():
     for name in patient_names:
         patient = Patient(name)
         
-        for sensor_type, strategy in default_strategies.items():
-            patient.set_strategy(sensor_type, strategy)
+        for sensor_type, strategy in default_sensors.items():
+            patient.add_sensor(sensor_type, strategy)
 
         patient.add_doctor(doctor)
         patients.append(patient)
